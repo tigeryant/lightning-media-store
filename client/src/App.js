@@ -1,5 +1,5 @@
-import './App.css';
 import { useState, useEffect} from 'react'
+import Media from './Media'
 
 function App() {
   const [alias, setAlias] = useState('')
@@ -14,7 +14,10 @@ function App() {
   }, []);
 
   return (
-    <p>Alias: {alias}</p>
+    <>
+      <p>Alias: {alias}</p>
+      <Media />
+    </>
   );
 }
 

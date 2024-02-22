@@ -53,6 +53,16 @@ app.get("/getinfo", function (req, res) {
   });
 });
 
+app.get("/generate-invoice/:source/:price", function (req, res) {
+  let request = { 
+    value: req.params['price'],
+    memo: req.params['source']
+  };
+  client.addInvoice(request, function(err, response) {
+    res.json(response);
+  });
+});
+
 app.listen(port, () => {
   console.log(`Listening at http://localhost:${port}`)
 })
