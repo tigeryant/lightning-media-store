@@ -7,3 +7,7 @@ This web application allows users to purchase media (images) by paying an invoic
 * Express
 * Polar
 * LND
+
+### Protocols
+* gRPC
+* REST

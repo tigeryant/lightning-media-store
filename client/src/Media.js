@@ -59,9 +59,32 @@ const Media = () => {
           }
           return m;
         });
+        console.log(updateMedia)
         setMedia(updateMedia);
         }
       )
+  }
+
+  function checkInvoice(paymentHash) {
+    fetch(`/check-invoice/${paymentHash}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.settled === true) {
+          const updateMedia = mediaList.map((m) => {
+            if (m.source === data.memo) {
+              return {
+                ...m,
+                invoice: 'THANK YOU',
+                checkButton: true,
+              };
+            }
+            return m;
+          });
+          setMedia(updateMedia);
+        } else {
+          alert("Payment not yet received")
+        }
+      })
   }
 
   return (
@@ -76,6 +99,7 @@ const Media = () => {
             <img src={"assets/" + m.source} height="220px" style={{margin:'auto', maxWidth:'100%'}} alt={m.name} />
             <br />
             <button disabled={m.buyButton} style={{padding: '10px', margin: '10px'}} type="button" onClick={ () => { generateInvoice(m.source, m.price) } }>Buy</button>
+            <button disabled={m.checkButton} style={{padding: '10px', margin: '10px'}} type="button" onClick={ () => { checkInvoice(m.paymentHash) } }>Check Payment</button>
             <br></br>
             <textarea style={{ resize: "none" }}rows="9" cols="32" value={m.invoice} readOnly></textarea>
           </div>

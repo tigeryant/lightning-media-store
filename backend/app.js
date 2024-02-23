@@ -63,6 +63,20 @@ app.get("/generate-invoice/:source/:price", function (req, res) {
   });
 });
 
+app.get("/check-invoice/:payment_hash", function (req, res) {
+  let request = { 
+    r_hash_str: req.params['payment_hash'],
+    // r_hash: btoa(req.params['payment_request'])
+  };
+  client.lookupInvoice(request, function(err, response) {
+    if (err) {
+      console.log('Error: ' + err);
+    }
+    res.json(response);
+    }
+  );
+});
+
 app.listen(port, () => {
   console.log(`Listening at http://localhost:${port}`)
 })
