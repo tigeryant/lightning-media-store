@@ -66,27 +66,38 @@ const Media = () => {
   }
 
   function checkInvoice(paymentHash) {
-    fetch(`/check-invoice/${paymentHash}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.settled === true) {
-          const updateMedia = mediaList.map((m) => {
-            if (m.source === data.memo) {
-              return {
-                ...m,
-                invoice: 'THANK YOU',
-                checkButton: true,
-              };
-            }
-            return m;
-          });
-          setMedia(updateMedia);
-        } else {
-          alert("Payment not yet received")
-        }
-      })
-  }
+      fetch(`/check-invoice/${paymentHash}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.settled === true) {
+            getContent(data.memo).then(
+              (res) => {
+                const updateMedia = mediaList.map((m) => {
+                  if (m.source === data.memo) {
+                    return {
+                      ...m,
+                      invoice: 'THANK YOU',
+                      checkButton: true,
+                      fileDownloadUrl: res
+                    };
+                  }
+                  return m;
+                });
+                setMedia(updateMedia);
+              }
+            )
+          }
+          else {
+            alert("Payment not yet received")
+          }
+        })
+    }
 
+  async function getContent(source) {
+    return await fetch(`/file/${source}`)
+      .then(res => res.blob())
+      .then(blob => URL.createObjectURL(blob))
+  }
   return (
     <div>
     { mediaList.map((m) => {
@@ -102,6 +113,10 @@ const Media = () => {
             <button disabled={m.checkButton} style={{padding: '10px', margin: '10px'}} type="button" onClick={ () => { checkInvoice(m.paymentHash) } }>Check Payment</button>
             <br></br>
             <textarea style={{ resize: "none" }}rows="9" cols="32" value={m.invoice} readOnly></textarea>
+            <br></br>
+            <a style={{visibility: (!m.checkButton || !m.buyButton) ? "hidden" : "visible" }} href={m.fileDownloadUrl} rel="noreferrer" target="_blank">View</a>
+            <br></br>
+            <a style={{visibility: (!m.checkButton || !m.buyButton) ? "hidden" : "visible" }} href={m.fileDownloadUrl} rel="noreferrer" target="_blank" download>Download</a>
           </div>
         </div>
       )})

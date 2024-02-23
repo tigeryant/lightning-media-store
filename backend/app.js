@@ -7,6 +7,8 @@ const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
 const fs = require("fs");
 
+const path = require('path')
+
 process.env.GRPC_SSL_CIPHER_SUITES = 'HIGH+ECDSA'
 
 const loaderOptions = {
@@ -76,6 +78,27 @@ app.get("/check-invoice/:payment_hash", function (req, res) {
     }
   );
 });
+
+app.get('/file/:source', function (req, res, next) {
+
+  var options = {
+    // root: path.join(__dirname, 'static'),
+    dotfiles: 'deny',
+    headers: {
+      'x-timestamp': Date.now(),
+      'x-sent': true
+    }
+  }
+
+  var fileName = path.join(path.join(__dirname, 'static'))
+  res.download(path.join(__dirname, 'static', req.params['source']), req.params['source'], options, function (err) {
+    if (err) {
+      next(err)
+    } else {
+      console.log('Sent:', fileName)
+    }
+  })
+})
 
 app.listen(port, () => {
   console.log(`Listening at http://localhost:${port}`)
